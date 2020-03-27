@@ -17,6 +17,7 @@ The submission file contains:
 Any question, suggestion or comment is welcomed.
 
 References
+
 [1] Magalhaes, F., Cunha, A., & Caetano, E. (2009). Online automatic identification of the modal parameters of a long span arch bridge. Mechanical Systems and Signal Processing, 23(2), 316-329.
 
 [2] Cheynet, E., Jakobsen, J. B., & Snæbjörnsson, J. (2016).Buffeting response of a suspension bridge in complex terrain. Engineering Structures, 128, 474-487.
