@@ -2,7 +2,7 @@
 The modal parameters of a line-like structure are automatically identified using an SSI-COV algorithm applied to ambient vibration data
 
 [![View Operational modal analysis with automated SSI-COV algorithm on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://se.mathworks.com/matlabcentral/fileexchange/69030-operational-modal-analysis-with-automated-ssi-cov-algorithm)
-
+[![DOI](https://zenodo.org/badge/248938005.svg)](https://zenodo.org/badge/latestdoi/248938005)
 
 The function SSICOV.m aims to automatically identify the eigenfrequencies, mode shapes and damping ratios of a line-like structure using ambient vibrations only. The covariance-driven stochastic subspace identification method (SSI-COV) is used in combination with a clustering algorithm to automatically analyse the stabilization diagrams. 
 
