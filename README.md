@@ -4,9 +4,14 @@ The modal parameters of a line-like structure are automatically identified using
 [![View Operational modal analysis with automated SSI-COV algorithm on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://se.mathworks.com/matlabcentral/fileexchange/69030-operational-modal-analysis-with-automated-ssi-cov-algorithm)
 [![DOI](https://zenodo.org/badge/248938005.svg)](https://zenodo.org/badge/latestdoi/248938005)
 
+
+## Summary
+
 The function SSICOV.m aims to automatically identify the eigenfrequencies, mode shapes and damping ratios of a line-like structure using ambient vibrations only. The covariance-driven stochastic subspace identification method (SSI-COV) is used in combination with a clustering algorithm to automatically analyse the stabilization diagrams. 
 
 The algorithm is inspired by the one used by Magalhaes et al. [1]. It has been applied for ambient vibration monitoring of the Lysefjord Bridge [2] and was compared to the frequency domain decomposition technique [3]. Finally, the algorithm was found accurate enough to visualise the evolution of the bridge eigenfrequencies with the temperature [4].
+
+## content
 
 The submission file contains:
 - A data file BridgeData.mat
@@ -16,7 +21,7 @@ The submission file contains:
 
 Any question, suggestion or comment is welcomed.
 
-References
+## References
 
 [1] Magalhaes, F., Cunha, A., & Caetano, E. (2009). Online automatic identification of the modal parameters of a long span arch bridge. Mechanical Systems and Signal Processing, 23(2), 316-329.
 
