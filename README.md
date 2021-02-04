@@ -16,6 +16,7 @@ The algorithm is inspired by the one used by Magalhaes et al. [1]. It has been a
 The submission file contains:
 - A data file BridgeData.mat
 - A Matlab Live Script Example1.mlx that illustrates the application of the algorithm.
+- A Matlab Live Script Example1_noToolbox.mlx that reproduce Example1 but using the function SSICOV_noToolbox.
 - The function SSICOV which is the automated SSI-COV algorithm.
 - The function SSICOV_noToolbox which is the automated SSI-COV algorithm but does not use the Statistics and Machine Learning Toolbox. The Linkage algorithm is replaced by the function "PHA_Clustering" by [5] and the function "cluster" is replaced by the function "Cluster2", which is derived from [6].
 - The function plotStabDiag.m, which plot the stabilization diagram.
