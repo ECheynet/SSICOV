@@ -1,5 +1,4 @@
-
-function [fn,zeta,phi,varargout] = SSICOV(y,dt,varargin)
+function [fn,zeta,phi,varargout] = SSICOV_V2(y,dt,varargin)
 %
 % -------------------------------------------------------------------------
 % [fn,zeta,phi,varargout] = SSICOV(y,dt,varargin) identifies the modal
@@ -62,6 +61,7 @@ function [fn,zeta,phi,varargout] = SSICOV(y,dt,varargin)
 % -------------------------------------------------------------------------
 %
 % see also plotStabDiag.m
+
 %%
 % options: default values
 p = inputParser();
@@ -75,10 +75,12 @@ p.addOptional('eps_zeta',4e-2);
 p.addOptional('eps_MAC',5e-3);
 p.addOptional('eps_cluster',0.2);
 p.parse(varargin{:});
+
 % Number of outputs must be >=3 and <=4.
 nargoutchk(3,4)
 % size of the input y
 [Nyy,N]= size(y);
+
 % shorthen the variables name
 eps_freq = p.Results.eps_freq ;
 eps_zeta = p.Results.eps_zeta ;
@@ -86,6 +88,7 @@ eps_MAC = p.Results.eps_MAC ;
 eps_cluster = p.Results.eps_cluster ;
 Nmin = p.Results.Nmin ;
 Nmax = p.Results.Nmax ;
+
 %  Natural Excitation Technique (NeXT)
 [IRF,~] = NExT(y,dt,p.Results.Ts,p.Results.methodCOV);
 % Block Hankel computations
@@ -118,14 +121,17 @@ for ii=Nmax:-1:Nmin % decreasing order of poles
     end
     kk=kk+1;
 end
+
 % sort for increasing order of poles
 stablity_status=fliplr(stablity_status);
 fn2=fliplr(fn2);
 zeta2=fliplr(zeta2);
 phi2=fliplr(phi2);
 MAC=fliplr(MAC);
+
 % get only stable poles
 [fnS,zetaS,phiS,MACS] = getStablePoles(fn2,zeta2,phi2,MAC,stablity_status);
+
 if isempty(fnS)
     warning('No stable poles found');
     fn = nan;
@@ -136,6 +142,7 @@ if isempty(fnS)
     end
     return
 end
+
 % Hierarchical cluster
 [fn3,zeta3,phi3] = myClusterFun(fnS,zetaS,phiS);
 if isnumeric(fn3)
@@ -149,6 +156,8 @@ if isnumeric(fn3)
     return
 end
 % average the clusters to get the frequency and mode shapes
+
+
 % Up to Nmax parameters are identified
 fn = zeros(1,Nmax);
 zeta = zeros(1,Nmax);
@@ -158,13 +167,16 @@ for ii=1:numel(fn3)
     zeta(ii)=nanmean(zeta3{ii});
     phi(ii,:)=nanmean(phi3{ii},2);
 end
+
 phi(fn==0,:)=[];
 zeta(fn==0)=[];
 fn(fn==0)=[];
+
 % sort the eigen frequencies
 [fn,indSort]=sort(fn);
 zeta = zeta(indSort);
 phi = phi(indSort,:);
+
 % varargout for stabilization diagram
 if nargout==4
     paraPlot.status=stablity_status;
@@ -173,6 +185,7 @@ if nargout==4
     paraPlot.fn = fn2;
     varargout = {paraPlot};
 end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     function [U,S,V] = blockToeplitz(h)
         %
@@ -436,24 +449,35 @@ end
             
         end
         
-        if numel(pos)==1
+        if numel(pos)==1,
             warning('linkage failed: at least one distance (two observations) are required');
             fn = nan;
             zeta = nan;
             phi = nan;
             return
         else
-            Z =  linkage(pos,'single','euclidean');
-            myClus = cluster(Z,'Cutoff',eps_cluster,'Criterion','distance');
-            Ncluster = max(myClus);
+
+        Tree = PHA_Clustering(pos);
+        [~, myClus0, Number] = Cluster2(Tree,'Limit',eps_cluster);
+        
+     
+%              Z =  linkage(pos,'single','euclidean');
+%              myClus = cluster(Z,'Cutoff',eps_cluster,'Criterion','distance');
+%             
+            
+            
+            
+            
+            Ncluster = numel(myClus0);
             
             ss=1;
             fn = {}; zeta = {}; phi = {};
             for rr=1:Ncluster
-                if numel(myClus(myClus==rr))>5
-                    dummyZeta = zeta0(myClus==rr);
-                    dummyFn = fn0(myClus==rr);
-                    dummyPhi = phi0(:,myClus==rr);
+                myClus = myClus0{rr};
+                if numel(myClus)>5
+                    dummyZeta = zeta0(myClus);
+                    dummyFn = fn0(myClus);
+                    dummyPhi = phi0(:,myClus);
                     valMin = max(0,(quantile(dummyZeta,0.25) - abs(quantile(dummyZeta,0.75)-quantile(dummyZeta,0.25))*1.5));
                     valMax =quantile(dummyZeta,0.75) + abs(quantile(dummyZeta,0.75)-quantile(dummyZeta,0.25))*1.5;
                     dummyFn(or(dummyZeta>valMax,dummyZeta<valMin)) = [];
@@ -486,4 +510,184 @@ end
             y = 0;
         end
     end
+% Analysis of tree
+    function [Roots, Clusters, Number] = Cluster2(Tree,Parameter,Value)
+        
+        % Empty roots and nodes vectors
+        Roots = [];
+        Nodes = [];
+        
+        % Vector length
+        N = max(max(Tree(:,1:2)))/2+1;
+        
+        % Clustering parameter
+        switch lower(Parameter)
+            
+            % Number of clusters
+            case 'number'
+                Number = Value;
+                Limit = Tree(end-Number+1+1,3);
+                if Limit == 0
+                    return
+                end
+                
+                % Dissimilarity limit
+            case 'limit'
+                Limit = Value;
+                Number = N-find(Tree(:,3)>=Limit,1,'first')+1;
+                
+        end
+        
+        % Clusters
+        Clusters = cell(Number,1);
+        
+        % Cluster number
+        Cluster = 0;
+        
+        % Exploration of the node
+        ExplorationDown(Tree(end,1),Tree(end,3));
+        ExplorationDown(Tree(end,2),Tree(end,3));
+        
+        % Exploration of the subnodes of a node
+        function ExplorationDown(Node,Dissimilarity)
+            
+            if ismember(Node,Nodes) || ismember(Node,Roots)
+                return
+            end
+            
+            % Adding of the current node in nodes list
+            Nodes = [Nodes Node];
+            
+            if Node <= N
+                
+                % Root
+                Roots = [Roots Node];
+                
+                % Root whose distance is higher than limit
+                [n,~]=find(Tree(:,1:2)==Node);
+                if Tree(n,3) >= Limit
+                    Cluster = Cluster+1;
+                end
+                
+                % Cluster
+                Clusters{Cluster} = [Clusters{Cluster} Node];
+                
+            else
+                
+                % Nodes
+                Node = Node-N;
+                
+                % Subnodes
+                N1 = Tree(Node,1);
+                N2 = Tree(Node,2);
+                
+                % Cluster index increment
+                if Tree(Node,3) < Limit && Dissimilarity >= Limit
+                    Cluster = Cluster+1;
+                end
+                
+                % Dissimilarity of current node
+                Dissimilarity = Tree(Node,3);
+                
+                if N1 <= N && N2 <= N
+                    
+                    % Roots subnodes
+                    if N1 < N2
+                        ExplorationDown(N1,Dissimilarity);
+                        ExplorationDown(N2,Dissimilarity);
+                    else
+                        ExplorationDown(N2,Dissimilarity);
+                        ExplorationDown(N1,Dissimilarity);
+                    end
+                    
+                else
+                    
+                    % Exploration of the subnodes
+                    ExplorationDown(N1,Dissimilarity);
+                    ExplorationDown(N2,Dissimilarity);
+                    
+                end
+                
+            end
+            
+        end
+        
+    end
+
+
+    function [Z, totalPotential, parents] = PHA_Clustering(dMatrix, S)
+        % ---Purpose---
+        % Performs hierarchical clustering using the PHA method
+        % The function will produce a hierarchical cluster tree (Z) from the input distance matrix
+        % The output Z is similar to the output by the Matlab function 'linkage'
+        %
+        % ---INPUT---
+        % dMatrix: distance matrix (numPts X numPts) defining distances between objects
+        % S: (optional) Scale factor for determining parameter delta. The default value is S=10.
+        %     If two points are closer than delta, they don't have attractive force.
+        %
+        % ---OUTPUT---
+        % Z: hierarchical cluster tree  which is represented as a matrix with size (numPts-1 X 3)
+        % totalPotential: total potential values
+        % parents: the parent index of each data
+        %
+        % ---HOW TO USE---
+        % Z = PHA_Clustering(dMatrix);
+        % T = cluster(Z,'maxclust',k);
+        %
+        % ---Author---
+        % Yonggang Lu (ylu@lzu.edu.cn)
+        %
+        % ---Reference---
+        % Yonggang Lu, Yi Wan. (2013). ¡°PHA: A Fast Potential-based Hierarchical Agglomerative
+        % Clustering Method, Pattern Recognition, Vol. 46(5), pp. 1227-1239.
+        %
+        [numPts,numPts2] = size(dMatrix); % numPts is the number of points
+        if (numPts ~= numPts2)
+            error(' PotentialHierachyWDistMatrix: distance matrix should be a square matrix! ');
+        end
+        if (nargin < 2)
+            S = 10;
+        end
+        % compute the dalta automatically
+        minDist = zeros(numPts, 1);
+        for i = 1:numPts
+            mask = (dMatrix(i,:)~=0);
+            minDist(i) = min(dMatrix(i, mask));
+        end
+        delta = mean(minDist)/S;
+        totalPotential = zeros(1, numPts);
+        for i = 1:numPts  % for each point
+            distToAll = dMatrix(i, :);
+            selIdxes  = find(distToAll >= delta);
+            totalP = sum(1./dMatrix(i, selIdxes));
+            totalP = totalP + (numPts-length(selIdxes)-1)*(1/delta); % for points within delta, potential = 1/delta
+            totalPotential(i)= - totalP;
+        end
+        [sortedP, sortedIdx] = sort(totalPotential);
+        parents = [1:numPts]; % stores the parent information
+        distToParent = zeros(1, numPts); % stores the distance to the parent point
+        for pi = 2:numPts
+            centerIdx = sortedIdx(pi);
+            visitedPtsIdx = sortedIdx(1:pi-1);
+            distToVisited = dMatrix(centerIdx, visitedPtsIdx);
+            
+            [minDist, minIdx] = min(distToVisited);
+            parents(centerIdx) = visitedPtsIdx(minIdx);
+            distToParent(centerIdx) = minDist;
+        end
+        % Z returns a (numPts-1) by 3 Matrix (same as linkage)
+        Z = zeros(numPts-1, 3);
+        [sortedDist, sortedIdx2] = sort(distToParent);
+        linkIdx = [1:numPts]; % remember the index after each layer of merging
+        for i = 1:numPts-1
+            mergeIdx = sortedIdx2(i+1);
+            Z(i, 1) = linkIdx(parents(mergeIdx));
+            Z(i, 2) = linkIdx(mergeIdx);
+            Z(i, 3) = sortedDist(i+1);
+            linkIdx(linkIdx==Z(i, 2)) = numPts+i;
+            linkIdx(linkIdx==Z(i, 1)) = numPts+i;
+        end
+    end
+
 end
