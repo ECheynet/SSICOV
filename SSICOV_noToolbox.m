@@ -1,7 +1,7 @@
-function [fn,zeta,phi,varargout] = SSICOV_V2(y,dt,varargin)
+function [fn,zeta,phi,varargout] = SSICOV_noToolbox(y,dt,varargin)
 %
 % -------------------------------------------------------------------------
-% [fn,zeta,phi,varargout] = SSICOV(y,dt,varargin) identifies the modal
+% [fn,zeta,phi,varargout] = SSICOV_noToolbox(y,dt,varargin) identifies the modal
 % parameters of the M-DOF system whose response histories are located in
 % the matrix y, sampled with a time step dt.
 % -------------------------------------------------------------------------
@@ -25,16 +25,16 @@ function [fn,zeta,phi,varargout] = SSICOV_V2(y,dt,varargin)
 % varargout: structure data useful for stabilization diagram
 % -------------------------------------------------------------------------
 %  Syntax:
-% [fn,zeta,phi] = SSICOV(y,dt,'Ts',30) specifies that the time lag
+% [fn,zeta,phi] = SSICOV_noToolbox(y,dt,'Ts',30) specifies that the time lag
 % has to be 30 seconds.
 %
-% [fn,zeta,phi] = SSICOV(y,dt,'Ts',30,'Nmin',5,'Nmax',40) specifies that the
+% [fn,zeta,phi] = SSICOV_noToolbox(y,dt,'Ts',30,'Nmin',5,'Nmax',40) specifies that the
 % time lag has to be 30 seconds, with a system order ranging from 5 to 40.
 %
-% [fn,zeta,phi] = SSICOV(y,dt,'eps_cluster',0.05) specifies that the
+% [fn,zeta,phi] = SSICOV_noToolbox(y,dt,'eps_cluster',0.05) specifies that the
 % max distance inside each cluster is 0.05 hz.
 %
-% [fn,zeta,phi] = SSICOV(y,dt,'eps_freq',1e-2,'eps_MAC'.1e-2) changes the
+% [fn,zeta,phi] = SSICOV_noToolbox(y,dt,'eps_freq',1e-2,'eps_MAC'.1e-2) changes the
 % default accuracy for the stability checking procedure
 %
 % -------------------------------------------------------------------------
@@ -189,7 +189,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     function [U,S,V] = blockToeplitz(h)
         %
-        % [U,S,V] = SSICOV(h) calculate the shifted block Toeplitz matrix T1 and
+        % [U,S,V] = blockToeplitz(h) calculate the shifted block Toeplitz matrix T1 and
         % the  result from the SVD of T1
         %
         % Input:
@@ -450,7 +450,7 @@ end
         end
         
         if numel(pos)==1,
-            warning('linkage failed: at least one distance (two observations) are required');
+            warning('At least one distance (two observations) are required');
             fn = nan;
             zeta = nan;
             phi = nan;
@@ -459,12 +459,6 @@ end
 
         Tree = PHA_Clustering(pos);
         [~, myClus0, Number] = Cluster2(Tree,'Limit',eps_cluster);
-        
-     
-%              Z =  linkage(pos,'single','euclidean');
-%              myClus = cluster(Z,'Cutoff',eps_cluster,'Criterion','distance');
-%             
-            
             
             
             
