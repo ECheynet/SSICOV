@@ -1,4 +1,4 @@
-# SSICOV
+# Operational modal analysis with automated SSI-COV algorithm
 The modal parameters of a line-like structure are automatically identified using an SSI-COV algorithm applied to ambient vibration data
 
 [![View Operational modal analysis with automated SSI-COV algorithm on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://se.mathworks.com/matlabcentral/fileexchange/69030-operational-modal-analysis-with-automated-ssi-cov-algorithm)
@@ -17,7 +17,7 @@ The submission file contains:
 - A data file BridgeData.mat
 - A Matlab Live Script Example1.mlx that illustrates the application of the algorithm.
 - The function SSICOV which is the automated SSI-COV algorithm.
-- The function SSICOV_noToolbox which is the automated SSI-COV algorithm but does not use the Statistics and Machine Learning Toolbox. The Linkage algorithm is replaced by the function "PHA_Clustering" by [5] and the function "cluster" is replaced by the function "Cluster2", which I derived from [6].
+- The function SSICOV_noToolbox which is the automated SSI-COV algorithm but does not use the Statistics and Machine Learning Toolbox. The Linkage algorithm is replaced by the function "PHA_Clustering" by [5] and the function "cluster" is replaced by the function "Cluster2", which is derived from [6].
 - The function plotStabDiag.m, which plot the stabilization diagram.
 
 Any question, suggestion or comment is welcomed.
@@ -34,4 +34,4 @@ Any question, suggestion or comment is welcomed.
 
 [5] Yonggang (2021). Fast hierarchical clustering method - PHA (https://www.mathworks.com/matlabcentral/fileexchange/46134-fast-hierarchical-clustering-method-pha), MATLAB Central File Exchange. Retrieved February 4, 2021. 
 
-[6]
+[6]  Eric Ogier (2021). Hierarchical clustering (https://www.mathworks.com/matlabcentral/fileexchange/56844-hierarchical-clustering), MATLAB Central File Exchange. Retrieved February 4, 2021. 
