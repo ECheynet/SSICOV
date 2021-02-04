@@ -17,6 +17,7 @@ The submission file contains:
 - A data file BridgeData.mat
 - A Matlab Live Script Example1.mlx that illustrates the application of the algorithm.
 - The function SSICOV which is the automated SSI-COV algorithm.
+- The function SSICOV_noToolbox which is the automated SSI-COV algorithm but does not use the Statistics and Machine Learning Toolbox. The Linkage algorithm is replaced by the function "PHA_Clustering" by [5] and the function "cluster" is replaced by the function "Cluster2", which I derived from [6].
 - The function plotStabDiag.m, which plot the stabilization diagram.
 
 Any question, suggestion or comment is welcomed.
@@ -30,3 +31,7 @@ Any question, suggestion or comment is welcomed.
 [3] Cheynet, E., Jakobsen, J. B., & Snæbjörnsson, J. (2017).Damping estimation of large wind-sensitive structures.Procedia Engineering, 199, 2047-2053.
 
 [4] Cheynet, E., Snæbjörnsson, J., & Jakobsen, J. B. (2017).Temperature Effects on the Modal Properties of a Suspension Bridge.In Dynamics of Civil Structures, Volume 2 (pp. 87-93). Springer.
+
+[5] Yonggang (2021). Fast hierarchical clustering method - PHA (https://www.mathworks.com/matlabcentral/fileexchange/46134-fast-hierarchical-clustering-method-pha), MATLAB Central File Exchange. Retrieved February 4, 2021. 
+
+[6]
